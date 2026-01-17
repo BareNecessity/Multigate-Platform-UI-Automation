@@ -1,1 +1,13 @@
-const { defineConfig } = require('@playwright/test');require('dotenv').config();module.exports = defineConfig({ testDir: './tests', use: { baseURL: process.env.BASE_URL }});
+require('dotenv').config();
+
+console.log('✅ Playwright config loaded');
+
+module.exports = {
+  globalSetup: require.resolve('./tests/global-setup'),
+
+  use: {
+    baseURL: process.env.BASE_URL,
+    storageState: 'storage/admin.json',
+  },
+};
+
