@@ -10,4 +10,3 @@ module.exports = {
     storageState: 'storage/admin.json',
   },
 };
-

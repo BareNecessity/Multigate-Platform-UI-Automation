@@ -1,38 +1,58 @@
-const { chromium } = require('@playwright/test');
+const { request } = require('@playwright/test');
 const fs = require('fs');
 
-console.log('▶️ Global setup started');
+console.log('▶️ Global setup (API auth) started');
 
 module.exports = async () => {
-  if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
-    throw new Error('❌ Missing ADMIN_EMAIL or ADMIN_PASSWORD');
+  if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD || !process.env.API_BASE_URL) {
+    throw new Error('❌ Missing API auth environment variables');
   }
 
   if (!fs.existsSync('storage')) {
     fs.mkdirSync('storage');
-    console.log('📁 storage folder created');
   }
 
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-
-  await page.goto(process.env.BASE_URL + '/login');
-
-  await page.fill('#email', process.env.ADMIN_EMAIL);
-  await page.fill('#password', process.env.ADMIN_PASSWORD);
-  await page.click('button[type="submit"]');
-
-  await page.waitForURL(/dashboard/);
-
-  await page.context().storageState({
-    path: 'storage/admin.json',
+  const apiContext = await request.newContext({
+    baseURL: process.env.API_BASE_URL,
+    extraHTTPHeaders: {
+      'Content-Type': 'application/json',
+    },
   });
 
-  console.log('✅ storage/admin.json created');
+  const response = await apiContext.post('/login', {
+    data: {
+      email: process.env.ADMIN_EMAIL,
+      password: process.env.ADMIN_PASSWORD,
+    },
+  });
 
-  await browser.close();
+  if (!response.ok()) {
+    throw new Error(`❌ Login API failed: ${response.status()}`);
+  }
+
+  const { accessToken } = await response.json();
+
+  if (!accessToken) {
+    throw new Error('❌ No accessToken returned from login API');
+  }
+
+  // Create a browser storage state manually
+  const storageState = {
+    cookies: [],
+    origins: [
+      {
+        origin: process.env.BASE_URL,
+        localStorage: [
+          {
+            name: 'accessToken',
+            value: accessToken,
+          },
+        ],
+      },
+    ],
+  };
+
+  fs.writeFileSync('storage/admin.json', JSON.stringify(storageState, null, 2));
+
+  console.log('✅ storage/admin.json created via API auth');
 };
-
-if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
-  throw new Error('❌ Missing ADMIN_EMAIL or ADMIN_PASSWORD in environment');
-}
