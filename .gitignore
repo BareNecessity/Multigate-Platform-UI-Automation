@@ -4,7 +4,7 @@
 # Playwright artifacts
 playwright-report/
 test-results/
-storage/
+storage/*.json
 
 # Node dependencies
 node_modules/

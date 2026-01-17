@@ -18,3 +18,7 @@ module.exports = async () => {
 
   await browser.close();
 };
+
+if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
+  throw new Error('❌ Missing ADMIN_EMAIL or ADMIN_PASSWORD in environment');
+}
