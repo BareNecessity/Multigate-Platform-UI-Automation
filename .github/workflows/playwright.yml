@@ -25,6 +25,9 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      - name: Create storage directory
+        run: mkdir -p storage
+
       - name: Run Playwright tests
         env:
           BASE_URL: ${{ secrets.BASE_URL }}
@@ -38,4 +41,10 @@ jobs:
 
           FXUSER_EMAIL: ${{ secrets.FXUSER_EMAIL }}
           FXUSER_PASSWORD: ${{ secrets.FXUSER_PASSWORD }}
-        run: npx playwright test
+        run: |
+          echo "🔎 Listing repo root"
+          ls -la
+          echo "🔎 Listing tests folder"
+          ls -la tests
+          echo "▶️ Running Playwright with explicit config"
+          npx playwright test --config=playwright.config.js
