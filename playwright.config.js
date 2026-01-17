@@ -1,0 +1,1 @@
+const { defineConfig } = require('@playwright/test');require('dotenv').config();module.exports = defineConfig({ testDir: './tests', use: { baseURL: process.env.BASE_URL }});

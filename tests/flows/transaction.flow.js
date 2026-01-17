@@ -1,0 +1,1 @@
+const TransactionPage=require('../pages/Transaction.page');async function submitTransaction(user,amount){const page=new TransactionPage(user.page);await page.open();await page.submit(amount);}module.exports={submitTransaction};

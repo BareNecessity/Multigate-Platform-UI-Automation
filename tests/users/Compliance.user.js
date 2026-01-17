@@ -1,0 +1,1 @@
+const { createSession } = require('../support/browser');async function Compliance(request){return await createSession('compliance',request);}module.exports={Compliance};

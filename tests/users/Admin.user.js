@@ -1,0 +1,1 @@
+const { createSession } = require('../support/browser');async function Admin(request){return await createSession('admin',request);}module.exports={Admin};

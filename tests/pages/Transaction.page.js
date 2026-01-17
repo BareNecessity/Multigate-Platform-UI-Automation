@@ -1,0 +1,1 @@
+class TransactionPage{constructor(page){this.page=page;}async open(){await this.page.goto('/transactions');}async submit(amount){await this.page.fill('#amount',amount);await this.page.click('text=Submit');}async status(){return this.page.textContent('.status');}}module.exports=TransactionPage;
