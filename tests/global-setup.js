@@ -1,6 +1,18 @@
 const { chromium } = require('@playwright/test');
+const fs = require('fs');
+
+console.log('▶️ Global setup started');
 
 module.exports = async () => {
+  if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
+    throw new Error('❌ Missing ADMIN_EMAIL or ADMIN_PASSWORD');
+  }
+
+  if (!fs.existsSync('storage')) {
+    fs.mkdirSync('storage');
+    console.log('📁 storage folder created');
+  }
+
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
@@ -15,6 +27,8 @@ module.exports = async () => {
   await page.context().storageState({
     path: 'storage/admin.json',
   });
+
+  console.log('✅ storage/admin.json created');
 
   await browser.close();
 };
