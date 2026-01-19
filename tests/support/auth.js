@@ -1,1 +1,0 @@
-async function login(request, role){const r=await request.post('/api/auth/login',{data:{email:`${role}@test.com`,password:process.env.PASSWORD}});return r.json();}module.exports={login};

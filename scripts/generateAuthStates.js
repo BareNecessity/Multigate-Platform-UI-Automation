@@ -1,4 +1,8 @@
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+const path = require('path');
+require('dotenv').config({
+  path: path.resolve(__dirname, '../.env'),
+});
+
 const { chromium } = require('@playwright/test');
 const fs = require('fs');
 
@@ -9,7 +13,6 @@ if (!BASE_URL || !API_BASE_URL) {
   throw new Error('BASE_URL or API_BASE_URL missing');
 }
 
-// 🔑 Define roles in ONE place
 const roles = [
   {
     name: 'admin',
@@ -39,7 +42,6 @@ const roles = [
 
     console.log(`➡️ Logging in as ${role.name}`);
 
-    // 1️⃣ Login via API
     const response = await fetch(API_BASE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -56,11 +58,6 @@ const roles = [
 
     const loginData = await response.json();
 
-    if (!loginData.accessToken) {
-      throw new Error(`No accessToken for ${role.name}`);
-    }
-
-    // 2️⃣ Build sessionStorage payload
     const currentUser = {
       token: loginData.accessToken,
       refreshToken: loginData.refreshToken,
@@ -68,13 +65,11 @@ const roles = [
       user: loginData.user,
     };
 
-    // 3️⃣ Save sessionStorage payload explicitly
     fs.writeFileSync(
       `storage/${role.name}.currentUser.json`,
       JSON.stringify(currentUser, null, 2)
     );
 
-    // 4️⃣ Create Playwright storageState (cookies, etc.)
     const browser = await chromium.launch();
     const context = await browser.newContext();
     const page = await context.newPage();
