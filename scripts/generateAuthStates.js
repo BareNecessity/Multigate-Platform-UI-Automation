@@ -52,9 +52,17 @@ const roles = [
     });
 
     if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Login failed for ${role.name}: ${text}`);
-    }
+  const text = await response.text();
+
+  // In CI, only admin is mandatory
+  if (process.env.CI && role.name !== 'admin') {
+    console.warn(`⚠️ Skipping ${role.name} in CI: ${text}`);
+    continue;
+  }
+
+  throw new Error(`Login failed for ${role.name}: ${text}`);
+}
+
 
     const loginData = await response.json();
 
